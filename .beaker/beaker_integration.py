@@ -27,9 +27,9 @@ from beaker import (
 SOURCE_ROOT = Path(__file__).resolve().parents[1]
 WORKER = Path(__file__).resolve().with_name("tblite_worker.py")
 # Production-like default when the run selects no model; Beaker's provider routing carries it.
-DEFAULT_PROVIDER = "openrouter"
-DEFAULT_BASE_URL = "https://openrouter.ai/api/v1"
-DEFAULT_MODEL = "openai/gpt-6-luna"
+DEFAULT_PROVIDER = "custom"
+DEFAULT_BASE_URL = "https://api.openai.com/v1"
+DEFAULT_MODEL = "gpt-6-luna"
 MAX_ITERATIONS = 150
 HERMES_PYTHON = "3.14"
 # Docker pull, sandbox start and teardown on top of the task's own agent + test budgets.
@@ -135,9 +135,9 @@ def _model_route(runtime: RolloutRuntime) -> tuple[dict, str]:
     if runtime.model:
         target = inference_target(runtime)
         return {"provider": "custom", "base_url": target.base_url, "model": target.model}, target.api_key
-    api_key = os.environ.get("OPENROUTER_API_KEY")
+    api_key = os.environ.get("OPENAI_API_KEY")
     if not api_key:
-        raise RuntimeError("OPENROUTER_API_KEY is unset; hosted runs get it from Beaker provider routing")
+        raise RuntimeError("OPENAI_API_KEY is unset; hosted runs get it from Beaker provider routing")
     return {"provider": DEFAULT_PROVIDER, "base_url": DEFAULT_BASE_URL, "model": DEFAULT_MODEL}, api_key
 
 
