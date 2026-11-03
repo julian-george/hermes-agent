@@ -31,7 +31,9 @@ from setuptools.command.sdist import sdist
 
 _ROOT = os.path.dirname(os.path.abspath(__file__))
 
-_IN_NIX_BUILD = os.environ.get("HERMES_NIX_BUILD") == "1"
+# Beaker's eval image always runs `pip install /integration` and cannot set build env vars.
+_IN_BEAKER_IMAGE_BUILD = _ROOT == "/integration"
+_WHEEL_BUILD_ALLOWED = os.environ.get("HERMES_NIX_BUILD") == "1" or _IN_BEAKER_IMAGE_BUILD
 
 _BLOCK_MESSAGE = (
     "Building wheels or sdists for hermes-agent is not supported.\n"
@@ -48,7 +50,7 @@ _BLOCK_MESSAGE = (
 
 class _GuardedSdist(sdist):
     def run(self, *args, **kwargs):
-        if not _IN_NIX_BUILD:
+        if not _WHEEL_BUILD_ALLOWED:
             raise RuntimeError(_BLOCK_MESSAGE)
         return super().run(*args, **kwargs)
 
@@ -65,7 +67,7 @@ try:
 
     class _GuardedBdistWheel(bdist_wheel):
         def run(self, *args, **kwargs):
-            if not _IN_NIX_BUILD:
+            if not _WHEEL_BUILD_ALLOWED:
                 raise RuntimeError(_BLOCK_MESSAGE)
             return super().run(*args, **kwargs)
 

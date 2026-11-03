@@ -567,6 +567,10 @@ dev = [
   "ruff==0.15.22",
   "setuptools==83.0.0",
 ] # starlette: CVE-2026-48710; setuptools: 83 (torch >=2.13 requires setuptools 83)
+# Beaker optimization tooling (.beaker/); never part of the runtime payload.
+beaker = [
+  "beaker-sdk[tracing]==0.6.6; sys_platform != 'android'",  # gh-bin has no Android wheels
+]
 # Native launcher and provider-catalog E2E dependencies belong in the test
 # environment, not the core runtime. Keep the Anthropic SDK at the same
 # reviewed version as the optional runtime extra above.
@@ -677,7 +681,7 @@ override-dependencies = [
 # the lock the day it ships, because holding it back keeps the bad root trusted.
 # Only packages whose job is CA trust belong in exclude-newer-package.
 exclude-newer = "3 days"
-exclude-newer-package = { certifi = false }
+exclude-newer-package = { certifi = false, beaker-sdk = false }  # beaker-sdk: Beaker eval tooling pinned to its lockstep release
 
 [tool.setuptools]
 # Root single-file modules are derived by setup.py at build time from the

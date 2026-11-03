@@ -1,0 +1,21 @@
+# Beaker configuration. Safe to commit; keep secret values out of this file.
+# integrations.<id>.required_env lists names used by setup and evaluation.
+# Keep local values in .beaker/.env and hosted values in encrypted agent settings.
+# source_dir is Git-root-relative; package_import_root is relative to source_dir.
+# Prefer the same immutable --dataset NAME@REVISION for smoke and launch.
+# Hermes itself runs on Python 3.14 in a uv venv the integration builds (Beaker images stop at 3.13);
+# docker.io lets each case run in its task's own image inside Beaker's VM sandbox.
+integrations:
+  tblite:
+    agent_key: hermes-tblite
+    entrypoint: beaker_integration:integration
+    package_import_root: .beaker
+    source_dir: .
+    required_env: []
+    environment_base: debian_slim:3.13
+    apt_install:
+      - docker.io
+      - iptables
+    pip_install:
+      - uv==0.13.6
+default_integration: tblite

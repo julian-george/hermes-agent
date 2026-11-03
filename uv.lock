@@ -14,6 +14,7 @@ exclude-newer = "0001-01-01T00:00:00Z" # This has no effect and is included for 
 exclude-newer-span = "P3D"
 
 [options.exclude-newer-package]
+beaker-sdk = false
 certifi = false
 
 [manifest]
@@ -573,6 +574,30 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/7f/45/8ae61209bb9015f516102fa559a2914178da1d5868428bd86a1b4421141d/base58-2.1.1.tar.gz", hash = "sha256:c5d0cb3f5b6e81e8e35da5754388ddcc6d0d14b6c6a132cb93d69ed580a7278c", size = 6528, upload-time = "2021-10-30T22:12:17.858Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/4a/45/ec96b29162a402fc4c1c5512d114d7b3787b9d1c2ec241d9568b4816ee23/base58-2.1.1-py3-none-any.whl", hash = "sha256:11a36f4d3ce51dfc1043f3218591ac4eb1ceb172919cebe05b52a5bcc8d245c2", size = 5621, upload-time = "2021-10-30T22:12:16.658Z" },
+]
+
+[[package]]
+name = "beaker-sdk"
+version = "0.6.6"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "certifi" },
+    { name = "gh-bin", marker = "sys_platform != 'win32'" },
+    { name = "packaging" },
+    { name = "pydantic" },
+    { name = "pyyaml" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/aa/4b/cc7bac19b348cb4c8d108971ee7592b40454676c769734be0c9044f75758/beaker_sdk-0.6.6.tar.gz", hash = "sha256:1b313c7e6ccc23370ca44e3056a3284624a485185dc6811ef3e9d6f4fed069b5", size = 222373, upload-time = "2026-11-02T20:01:09.798Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/41/25/92a7eb65ce56308468f0f3656516acebe21bd6fb8682afa104db108a3330/beaker_sdk-0.6.6-py3-none-any.whl", hash = "sha256:c1e8a9eada2d628c6f8b4fc8aa32a16b2790de64bebbcd1f3e16df63ceca3f32", size = 248134, upload-time = "2026-11-02T20:01:08.354Z" },
+]
+
+[package.optional-dependencies]
+tracing = [
+    { name = "opentelemetry-api" },
+    { name = "opentelemetry-exporter-otlp-proto-http" },
+    { name = "opentelemetry-proto" },
+    { name = "opentelemetry-sdk" },
 ]
 
 [[package]]
@@ -2007,6 +2032,17 @@ wheels = [
 ]
 
 [[package]]
+name = "gh-bin"
+version = "2.97.0"
+source = { registry = "https://pypi.org/simple" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/a6/3d/b100b5322b13674fd0f52c7ca4e9f5ffde506338339c43eeb03e16d03317/gh_bin-2.97.0-py3-none-macosx_10_9_x86_64.whl", hash = "sha256:400db8e23c7f2750e139dab4d3b62210c85493a1944f4e7480ab8171cd8aef9a", size = 14963560, upload-time = "2026-08-03T17:43:20.951Z" },
+    { url = "https://files.pythonhosted.org/packages/7b/09/24a16f0ac9e2d528b97d7222288212782fc0ad0a94533f8837e224b5a23b/gh_bin-2.97.0-py3-none-macosx_11_0_arm64.whl", hash = "sha256:1f90e560f664109b64b75f97e8464571b7892d6f9dfc6d4c0a378c80138fbd50", size = 13298174, upload-time = "2026-08-03T17:43:27.78Z" },
+    { url = "https://files.pythonhosted.org/packages/bc/0e/e6ff59e79185ef6d7eaceb15679e732e6305b2ceb75999bacc844d0b320c/gh_bin-2.97.0-py3-none-manylinux2014_aarch64.musllinux_1_1_aarch64.whl", hash = "sha256:1dcce473529e8b4c4968fde79dcf839a2da68cb64eaa64c730f69ca685751ab2", size = 13045917, upload-time = "2026-08-03T17:43:23.363Z" },
+    { url = "https://files.pythonhosted.org/packages/92/af/07dfe02b685090c9086c9851fcf53f3a55437baabfeb1d30370da2c47f77/gh_bin-2.97.0-py3-none-manylinux2014_x86_64.musllinux_1_1_x86_64.whl", hash = "sha256:0d3d2b8f86b1ab5e89a8a082606442813b165aeab8ec37f3f7f4dbef8903ddb6", size = 14477088, upload-time = "2026-08-03T17:43:25.65Z" },
+]
+
+[[package]]
 name = "google-api-core"
 version = "2.42.0"
 source = { registry = "https://pypi.org/simple" }
@@ -2591,6 +2627,9 @@ youtube = [
 ]
 
 [package.dev-dependencies]
+beaker = [
+    { name = "beaker-sdk", extra = ["tracing"], marker = "sys_platform != 'android'" },
+]
 dev = [
     { name = "debugpy" },
     { name = "httpx2" },
@@ -2778,6 +2817,7 @@ requires-dist = [
 provides-extras = ["uvloop", "anthropic", "exa", "firecrawl", "parallel-web", "ddgs", "fal", "edge-tts", "neutts", "kittentts", "piper", "modal", "daytona", "vercel", "google-meet", "messaging", "cron", "slack", "matrix", "wecom", "keychain", "tts-premium", "voice", "wake", "telegram", "discord", "stt-whisper", "audio-io", "silk", "wake-openwakeword", "wake-sherpa", "wake-porcupine", "google-chat", "doc-extract", "documents", "documents-pdf", "trace-upload", "vision", "pty", "mcp", "nemo-relay", "sms", "teams", "computer-use", "acp", "mistral", "otlp", "bedrock", "vertex", "azure-identity", "termux", "termux-all", "dingtalk", "feishu", "google", "youtube", "web", "all"]
 
 [package.metadata.requires-dev]
+beaker = [{ name = "beaker-sdk", extras = ["tracing"], marker = "sys_platform != 'android'", specifier = "==0.6.6" }]
 dev = [
     { name = "debugpy", specifier = "==1.8.22" },
     { name = "httpx2", specifier = "==2.15.1" },
