@@ -19,3 +19,7 @@ integrations:
     pip_install:
       - uv==0.13.6
 default_integration: tblite
+# Each case runs its own Docker task container inside one 8 GB rollout sandbox;
+# Beaker's default of 32 concurrent cases would exhaust its memory.
+config_defaults:
+  max_concurrency: 4
