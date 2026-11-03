@@ -171,7 +171,8 @@ async def run_case(*, case_input: dict, runtime: RolloutRuntime) -> CaseResult:
         env = {
             **os.environ,
             "HERMES_HOME": str(home),
-            "PYTHONPATH": str(SOURCE_ROOT),
+            # vendor/ holds non-editable Hermes packages kept out of Beaker's 30 MB source capsule.
+            "PYTHONPATH": f"{SOURCE_ROOT}:{SOURCE_ROOT / 'vendor'}",
             "TBLITE_MODEL_API_KEY": api_key,
             "TERMINAL_ENV": "docker",
             "TERMINAL_CONTAINER_PERSISTENT": "false",
