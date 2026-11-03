@@ -35,6 +35,8 @@ HERMES_PYTHON = "3.14"
 # Docker pull, sandbox start and teardown on top of the task's own agent + test budgets.
 WORKER_OVERHEAD_SECONDS = 900
 STATE_DIR = Path(tempfile.gettempdir()) / "beaker-tblite"
+# Beaker's evaluator PATH omits sbin, where Debian installs dockerd and iptables.
+SYSTEM_PATH = os.pathsep.join([os.environ.get("PATH", ""), "/usr/local/sbin", "/usr/sbin", "/sbin"])
 
 
 class TaskInput(BaseModel):
@@ -96,7 +98,9 @@ def _ensure_docker_daemon() -> None:
         if _docker_ready():
             return
         log = open(STATE_DIR / "dockerd.log", "ab")
-        subprocess.Popen(["dockerd"], stdout=log, stderr=log, start_new_session=True)
+        subprocess.Popen(
+            ["dockerd"], stdout=log, stderr=log, start_new_session=True, env={**os.environ, "PATH": SYSTEM_PATH},
+        )
         for _ in range(120):
             if _docker_ready():
                 return
@@ -112,14 +116,18 @@ def _ensure_hermes_python() -> Path:
     with _locked("venv"):
         if python.exists():
             return python
-        uv = shutil.which("uv")
+        uv = shutil.which("uv", path=SYSTEM_PATH)
         if uv is None:
             raise RuntimeError("uv is required to build the Hermes runtime environment")
-        subprocess.run(
+        sync = subprocess.run(
             [uv, "sync", "--frozen", "--no-install-project", "--no-default-groups", "--python", HERMES_PYTHON],
-            cwd=SOURCE_ROOT, env={**os.environ, "UV_PROJECT_ENVIRONMENT": str(venv)},
-            check=True, capture_output=True, timeout=1800,
+            cwd=SOURCE_ROOT,
+            env={**os.environ, "PATH": SYSTEM_PATH, "UV_PROJECT_ENVIRONMENT": str(venv), "UV_CACHE_DIR": str(STATE_DIR / "uv-cache"),
+                 "UV_PYTHON_INSTALL_DIR": str(STATE_DIR / "uv-python")},
+            capture_output=True, text=True, timeout=1800, check=False,
         )
+        if sync.returncode != 0:
+            raise RuntimeError(f"uv sync for the Hermes runtime failed:\n{sync.stderr[-4000:]}")
     return python
 
 
@@ -170,6 +178,8 @@ async def run_case(*, case_input: dict, runtime: RolloutRuntime) -> CaseResult:
         }))
         env = {
             **os.environ,
+            "PATH": SYSTEM_PATH,
+            "HOME": os.environ.get("HOME") or str(scratch_dir),
             "HERMES_HOME": str(home),
             # vendor/ holds non-editable Hermes packages kept out of Beaker's 30 MB source capsule.
             "PYTHONPATH": f"{SOURCE_ROOT}:{SOURCE_ROOT / 'vendor'}",
